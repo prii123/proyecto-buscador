@@ -1,6 +1,6 @@
 import os
 from sys import path
-
+from ..models import Terceros
 from selenium.webdriver.chrome.options import Options
 #from webdriver.chrome import ChromeDriverManager
 from webdriver_manager.chrome import ChromeDriverManager
@@ -24,6 +24,7 @@ class buscadorDIAN:
         self.driver = None
         self.url = "https://muisca.dian.gov.co/WebRutMuisca/DefConsultaEstadoRUT.faces"
         self.archivo = os.getcwd().split('buscador')[0]
+        self.consulta = []
 
     def iniciar_navegador(self):
         # Configurar las opciones del controlador de ChromeDriver
@@ -52,7 +53,7 @@ class buscadorDIAN:
         button_element.click()
 
         # Esperar algunos segundos para que la página se cargue después de hacer clic
-        self.driver.implicitly_wait(3)
+        self.driver.implicitly_wait(4)
 
         try:
             # Encontrar el elemento span por su ID y obtener su contenido
@@ -74,8 +75,24 @@ class buscadorDIAN:
             sN = span_segundo_nombre.text
             eR = span_estado_rut.text
             dV = span_dv.text
+            #guarda la informacion en la base de datos
+            """
+            self.consulta = Terceros(
+                nit=valor,
+                nombre1 = pN,
+                nombre2 = sN,
+                apellido1 = pA,
+                apellido2 = sA,
+                estadoRut = eR,
+                dv = dV
+            )
+           
+            consulta.save()
+            """
+            
 
             fila = [valor,dV, pA, sA, pN, sN, "", eR]
+            self.consulta = fila
             self.DATA.append(fila)
 
             #print(pA, sA, pN, sN, eR)
@@ -88,19 +105,46 @@ class buscadorDIAN:
                 rZ = span_razon_zocial_rut.text
                 eRR = span_estado_rut_raz.text
                 dvEm = span_dv_emp.text
+                #guarda la informacion en la base de datos
+                """
+                self.consulta = Terceros(
+                    nit=valor,
+                    razonSocial = rZ,
+                    estadoRut = eR,
+                    dv = dV
+                )
+                
+                consulta.save()
+                """
+                
 
                 fila = [valor,dvEm, "", "", "", "",rZ, eRR]
+                self.consulta = fila
                 self.DATA.append(fila)
+                
             except:
                 fila = [valor, "", "", "", "", "", "No Registrado"]
                 self.DATA.append(fila)
-
-
+                
 
     def multiples_busquedas(self):
         self.iniciar_navegador()
         for nit_busqueda in self.valoresBuscados:
             self.unaBusqueda(nit_busqueda)
+            """ """
+            tercero = Terceros(
+                    nit=self.consulta[0],
+                    dv = self.consulta[1],
+                    nombre1 = self.consulta[4],
+                    nombre2 = self.consulta[5],
+                    apellido1 = self.consulta[2],
+                    apellido2 = self.consulta[3],
+                    razonSocial = self.consulta[6],
+                    estadoRut = self.consulta[7]
+            )
+            tercero.save()
+            
+        
         self.cerrar_navegador()
 
 
