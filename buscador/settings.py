@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'drf_yasg',
     'terceros',
     'channels',
-    'rest_framework'
+    'rest_framework',
+    'rest_framework.authtoken'
 ]
 
 

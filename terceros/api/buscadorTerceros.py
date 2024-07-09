@@ -3,13 +3,14 @@
 from ..models import Terceros
 from django.http import JsonResponse
 from rest_framework.views import APIView
-
-from ..dian.buscadorDian import buscadorDIAN
-
 from .tasks import realizar_busquedas_dian
+from rest_framework.decorators import authentication_classes, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
 
 
-
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
 class SearchDataAPIView(APIView):
 
     def post(self, request):
