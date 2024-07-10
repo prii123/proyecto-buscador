@@ -8,10 +8,48 @@ from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
 
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 class SearchDataAPIView(APIView):
+    @swagger_auto_schema(
+        operation_description="Busca datos en la base de datos y en DIAN.",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_ARRAY,
+            items=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'nit': openapi.Schema(type=openapi.TYPE_INTEGER, description='NIT/CC'),
+                },
+            ),
+        ),
+        responses={
+            200: openapi.Response(
+                description="Respuesta del Servidor",
+                examples={
+                    "application/json": {
+                        "OK": [
+                            {
+                                "nit": 12345,
+                                "nit": 12346,
+                                "nit": 12347
+                                # Otros campos relevantes de la respuesta
+                            }
+                        ],
+                        "DIAN": [
+                            {
+                                "nit":123543,
+                                "nit":123543
+                            }
+                            ],
+                    }
+                }
+            ),
+        }
+    )
 
     def post(self, request):
         # Analiza los datos JSON del cuerpo de la solicitud
@@ -60,15 +98,4 @@ class SearchDataAPIView(APIView):
         return JsonResponse(combined_data)
 
 
-"""
-        # Iniciar la búsqueda en DIAN en un hilo separado
-        thread = threading.Thread(target=realizar_busquedas_dian, args=(missing_ids,))
-        thread.start()
-def realizar_busquedas_dian(missing_ids):
-    buscador = buscadorDIAN(missing_ids, 'xxxxxxxx')
-    buscador.multiples_busquedas()
-    data_return = buscador.retornar_datos()
-    print(data_return)
-
-"""
 
